@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Event Management</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🎉 Event Management System</h1>
+
+<h2>👩 Add Student</h2>
+<input id="sname" placeholder="Enter student name">
+<br>
+<button onclick="addStudent()">➕ Add Student</button>
+
+<h2>📅 Add Event</h2>
+<input id="ename" placeholder="Enter event name">
+<br>
+<button onclick="addEvent()">➕ Add Event</button>
+
+<h2>📋 View Events</h2>
+<button onclick="loadEvents()">🔍 Show Events</button>
+
+<div id="events"></div>
+
+</div>
+<script>
+
+function addStudent() {
+  fetch("http://localhost:3000/addStudent", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      name: document.getElementById("sname").value
+    })
+  }).then(() => alert("Student Added"));
+}
+
+function addEvent() {
+  fetch("http://localhost:3000/addEvent", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      event_name: document.getElementById("ename").value
+    })
+  }).then(() => alert("Event Added"));
+}
+
+function loadEvents() {
+  fetch("http://localhost:3000/events")
+  .then(res => res.json())
+  .then(data => {
+
+    let div = document.getElementById("events");
+    div.innerHTML = "";
+
+    data.forEach(e => {
+      let card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        📅 ${e.event_name}
+        <br>
+        <button onclick="deleteEvent(${e._id})">❌ Delete</button>
+      `;
+
+      div.appendChild(card);
+    });
+
+  });
+}
+function deleteEvent(id) {
+  fetch(`http://localhost:3000/deleteEvent/${id}`, {
+    method: "DELETE"
+  })
+  .then(() => {
+    alert("Event Deleted");
+    loadEvents(); // refresh list
+  });
+}
+
+</script>
+</body>
+</html>
